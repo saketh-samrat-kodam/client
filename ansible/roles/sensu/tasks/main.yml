@@ -1,0 +1,37 @@
+---
+- name: add the official Sensu repository's key
+  apt_key: url="https://sensu.global.ssl.fastly.net/apt/pubkey.gpg -O- | apt-key add -" state=present
+
+
+- copy: content="deb https://sensu.global.ssl.fastly.net/apt trusty main" 
+   dest=/etc/apt/sources.list.d/sensu.list
+
+- apt: update_cache=yes name=sensu state=present
+
+- name: install sensu
+  apt: name=sensu state=present
+
+- name: enable sensu-client to survive reboot
+  service: name=sensu-client enabled=yes
+
+- name: generate /etc/sensu/config.json
+  template:
+    src=client.json.j2
+    dest=/etc/sensu/conf.d/client.json
+    backup=yes
+
+
+- name: generate /etc/sensu/rabbitmq.json
+  template:
+    src=rabbitmq.json.j2
+    dest=/etc/sensu/conf.d/rabbitmq.json
+    backup=yes
+
+  notify: restart sensu client daemons
+
+- name: copy all the checks files
+  copy:
+    src=files/plugins
+    dest=/etc/sensu/plugins/
+    mode=0750
+  notify: restart sensu client daemons

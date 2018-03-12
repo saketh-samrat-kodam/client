@@ -1,0 +1,19 @@
+---
+- name: install nagios-nrpe-server
+  apt:
+    pkg: nagios-nrpe-server
+
+- name: install nagios plugins
+  apt:
+   pkg: nagios-plugins
+
+- name: Edit the nrpe.conf file to allow remote connectivity
+  template: src=nrpe.d.j2  dest=/etc/nagios/nrpe.d mode=0644
+  notify:
+    - restart nrpe
+
+
+#This is commented as this would break nagios-server, if nagios-server is configured both as nagios-server and nagios-client for redundancy
+#- name: Copy the nagios.conf file
+#  copy: src=client.nagios.conf dest=/etc/httpd/conf.d/nagios.conf mode=644
+

@@ -1,0 +1,10 @@
+- hosts: tag_name_ubuntu
+  become: yes
+
+  roles:
+    - role: java
+    - role: packetbeat
+    - role: metricbeat
+    - role: nagios
+#    - role: sensu
+    - role: splunk

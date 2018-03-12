@@ -1,0 +1,4 @@
+---
+java_tar_file: /home/ubuntu/jdk-8u45-linux-x64.tar.gz
+java_version_installed_dir: /opt/java/jdk1.8.0_45
+user.stdout: ubuntu

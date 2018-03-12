@@ -1,0 +1,57 @@
+---
+- name: ensure apt-transport-https installed
+  apt:
+    pkg: apt-transport-https
+    state: present
+
+- name: add elasticstack GPG key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: add elasticstack repository
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/5.x/apt stable main
+    state: present
+    update_cache: yes
+
+- name: install metricbeat
+  apt:
+    pkg: metricbeat
+
+- name: copy metricbeat configuration1
+  template:
+    src: metricbeat.yml.j2
+    dest: /etc/metricbeat/metricbeat.yml
+    mode: 644
+  notify: restart metricbeat
+
+
+- name: copy metricbeat configuration2
+  template:
+    src: metricbeat.full.yml.j2
+    dest: /etc/metricbeat/metricbeat.full.yml
+    mode: 644
+  notify: restart metricbeat
+
+- name: copy metricbeat configuration3
+  template:
+    src: metricbeat.template-es2x.json.j2
+    dest: /etc/metricbeat/metricbeat.template-es2x.json 
+    mode: 644
+  notify: restart metricbeat
+
+
+- name: copy metricbeat configuration4
+  template:
+    src: metricbeat.template.json.j2
+    dest: /etc/metricbeat/metricbeat.template.json 
+    mode: 644
+  notify: restart metricbeat
+
+
+- name: start and enable metricbeat
+  service:
+    name: metricbeat
+    state: started
+    enabled: yes

@@ -1,0 +1,6 @@
+---
+- name: restart nrpe
+  service: name=nagios-nrpe-server  state=restarted enabled=yes
+- name: restart xinted
+  service: name=xinetd state=restarted enabled=yes  
+#  shell: service xinetd restart; service nrpe restart

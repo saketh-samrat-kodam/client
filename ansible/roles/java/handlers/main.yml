@@ -1,0 +1,17 @@
+- name: update-alternatives for java
+  command: 'update-alternatives --install "/usr/bin/java" "java" "{{java_version_installed_dir}}/bin/java" 1'
+  when: java_version_installed_dir is defined
+  become_user: root
+  become: true
+
+- name: update-alternatives for javaws
+  command: update-alternatives --install "/usr/bin/javaws" "javaws" "{{java_version_installed_dir}}/bin/javaws" 1
+  when: java_version_installed_dir is defined
+  become_user: root
+  become: true
+
+- name: set JAVA_HOME in etc/enviroment
+  lineinfile: dest=/etc/environment line="JAVA_HOME={{java_version_installed_dir}}" state=present
+  become_user: root
+  become: true
+

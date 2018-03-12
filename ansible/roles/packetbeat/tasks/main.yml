@@ -1,0 +1,58 @@
+---
+- name: ensure apt-transport-https installed
+  apt:
+    pkg: apt-transport-https
+    state: present
+
+- name: add elasticstack GPG key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: add elasticstack repository
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/5.x/apt stable main
+    state: present
+    update_cache: yes
+
+- name: install packetbeat
+  apt:
+    pkg: packetbeat
+
+- name: copy packetbeat configuration1
+  template:
+    src: packetbeat.yml.j2
+    dest: /etc/packetbeat/packetbeat.yml
+    mode: 644
+  notify: restart packetbeat
+
+
+- name: copy packetbeat configuration2
+  template:
+    src: packetbeat.full.yml.j2
+    dest: /etc/packetbeat/packetbeat.full.yml
+    mode: 644
+  notify: restart packetbeat
+
+- name: copy packetbeat configuration3
+  template:
+    src: packetbeat.template-es2x.json.j2
+    dest: /etc/packetbeat/packetbeat.template-es2x.json
+    mode: 644
+  notify: restart packetbeat
+
+
+- name: copy packetbeat configuration4
+  template:
+    src: packetbeat.template.json.j2
+    dest: /etc/packetbeat/packetbeat.template.json
+    mode: 644
+  notify: restart packetbeat
+
+
+- name: start and enable packetbeat
+  service:
+    name: packetbeat
+    state: started
+    enabled: yes
+

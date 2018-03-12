@@ -1,0 +1,67 @@
+---
+- name: create java directory in opt folder if not exist
+  file: path=/opt/java state=directory mode=0777
+  become_user: root
+  become: true
+
+- name: check user name for assign permisson
+  command: bash -c "cat /etc/group | grep -i 1000 | cut -d ":" -f 1"
+  register: user
+  sudo_user: ubuntu
+  sudo: true
+
+- name: copy jdk from host to remote system
+  copy: src={{ java_tar_file }} dest=/opt/java mode=0777 owner={{ user.stdout }}
+  when: java_tar_file and user.stdout is defined
+  sudo_user: ubuntu
+  sudo: true
+
+#- name: downloading "{{ java_version }}" from java
+#  command: 'wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.tar.gz"'
+#  when: java_out_tar and java_download_url and user.stdout is defined
+#  sudo_user: ubuntu
+#  sudo: true
+
+- name: set JAVA_HOME in etc/enviroment
+  lineinfile: dest=/etc/environment line="JAVA_HOME={{java_version_installed_dir}}" state=present
+  become_user: root
+  become: true
+
+
+
+- name: extra " {{ java_tar_file }} "
+  unarchive: src={{ java_tar_file }} dest=/opt/java/ mode=0774 owner="{{user.stdout}}"
+  when: java_tar_file and user.stdout and user.stdout is defined
+  sudo_user: root
+  sudo: true
+  notify:
+    - update-alternatives for java
+    - update-alternatives for javaws
+    - set JAVA_HOME in etc/enviroment
+
+- name: create java set script
+  template: src=java.sh.j2 dest=/etc/profile.d/java.sh mode=777 force=no
+  sudo_user: root
+  sudo: true
+
+#- name: extra "{{ java_out_tar }}"
+#  unarchive: src={{ java_out_tar }} dest=/opt/java/
+#  when: java_out_tar and java_download_url is defined
+#  sudo_user: root
+#  sudo: true
+#  notify:
+#    - update-alternatives for java
+#    - update-alternatives for javaws
+#    - set JAVA_HOME in etc/enviroment
+
+- name: check JAVA_HOME
+  shell: echo $JAVA_HOME
+  sudo_user: root
+  sudo: true
+  register: java_home_check
+
+- name: set JAVA_HOME
+  shell: export JAVA_HOME={{java_version_installed_dir}}
+  sudo_user: root
+  sudo: true
+

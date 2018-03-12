@@ -1,0 +1,55 @@
+log_facility=daemon
+pid_file=/var/run/nrpe/nrpe.pid
+server_port=5666
+#server_address=127.0.0.1
+nrpe_user=nrpe
+nrpe_group=nrpe
+allowed_hosts=127.0.0.1
+{% for server1 in nagios_servers %}
+allowed_hosts={{server1}}
+{% endfor %}
+ 
+# Values: 0=do not allow arguments, 1=allow command arguments
+dont_blame_nrpe=0
+
+# Values: 0=do not allow bash command substitutions, 
+#         1=allow bash command substitutions
+allow_bash_command_substitution=0
+
+# command_prefix=/usr/bin/sudo 
+
+# Values: 0=debugging off, 1=debugging on
+debug=0
+
+command_timeout=60
+
+connection_timeout=300
+
+# Values: 0=only seed from /dev/[u]random, 1=also seed from weak randomness
+#allow_weak_random_seed=1
+
+
+#include=<somefile.cfg>
+
+command[check_users]=/usr/lib64/nagios/plugins/check_users -w 5 -c 10
+command[check_load]=/usr/lib64/nagios/plugins/check_load -w 15,10,5 -c 30,25,20
+command[check_disk]=/usr/lib64/nagios/plugins/check_disk -w 20% -c 10% 
+command[check_swap]=/usr/lib64/nagios/plugins/check_swap -w 70% -c 50%
+command[check_zombie_procs]=/usr/lib64/nagios/plugins/check_procs -w 5 -c 10 -s Z
+command[check_total_procs]=/usr/lib64/nagios/plugins/check_procs -w 150 -c 200 
+
+
+# The following examples allow user-supplied arguments and can
+# only be used if the NRPE daemon was compiled with support for 
+# command arguments *AND* the dont_blame_nrpe directive in this
+# config file is set to '1'.  This poses a potential security risk, so
+# make sure you read the SECURITY file before doing this.
+#command[check_users]=/usr/lib64/nagios/plugins/check_users -w $ARG1$ -c $ARG2$
+#command[check_load]=/usr/lib64/nagios/plugins/check_load -w $ARG1$ -c $ARG2$
+#command[check_disk]=/usr/lib64/nagios/plugins/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$
+#command[check_procs]=/usr/lib64/nagios/plugins/check_procs -w $ARG1$ -c $ARG2$ -s $ARG3$
+
+
+
+# INCLUDE CONFIG DIRECTORY (.cfg files)
+include_dir=/etc/nrpe.d/
